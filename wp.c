@@ -15,7 +15,9 @@ int worker(int id, void *p) {
 }
 
 int main(int argc, char *argv[]) {
-    int i, nProcs, nParallaldos, nImages;
+    int i, j;
+    int nProcs, nParallaldos, nImages;
+    int assignedProcess, x, y, r;
     char **parallaldos, **images;
     PI_PROCESS **processes;
 
@@ -39,8 +41,23 @@ int main(int argc, char *argv[]) {
     }
 
     PI_StartAll();
-    // Run algorithm.
-    // Print results.
+    
+    // Analyze parallaldos and image files.
+    assignedProcess = 0;
+    for (i = 0; i < nParallaldos; i++) {
+        for (j = 0; j < nImages; j++) {
+            if (nProcs == 1) {
+                // Run parallaldo searching algorithm.
+                // Print out result.
+            } else {
+                assignedProcess = (assignedProcess + 1) % (nProcs - 1);
+                PI_Write(instructions[assignedProcess], "%d%d", i, j);
+                PI_Read(results[assignedProcess], "%d%d%d", &y, &x, &r);
+                // Print out result.
+            }
+        }
+    }
+
     PI_StopMain(0);
 
     freeFilenames(nParallaldos, parallaldos);
