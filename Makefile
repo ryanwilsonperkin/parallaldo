@@ -12,10 +12,10 @@ wp: wp.o filenames.o
 	$(CC) $(LDFLAGS) wp.o filenames.o -o wp
 
 wp.o: wp.c
-	$(CC) $(CFLAGS) -c wp.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c wp.c
 
 filenames.o: filenames.c
-	$(CC) $(CFLAGS) -c filenames.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c filenames.c
 
 clean:
 	rm *.o
