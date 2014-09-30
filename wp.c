@@ -2,11 +2,13 @@
 #include <stdlib.h>
 
 #include "filenames.h"
+#include "wp.h"
 
 PI_CHANNEL **g_instructions;
 PI_CHANNEL **g_results;
 
-int worker(int id, void *p) {
+int worker(int id, void *p)
+{
     int parallaldo_id, image_id;
     // Repeatedly read data from PI_MAIN.
     // Quit when <0 values read.
@@ -22,7 +24,8 @@ int worker(int id, void *p) {
     return 0;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     int i, j;
     int n_procs, n_parallaldos, n_images;
     int assigned_process, x, y, r;
