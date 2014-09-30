@@ -9,19 +9,19 @@ PI_CHANNEL **g_results;
 
 int worker(int id, void *p)
 {
+    enum WorkerInstruction instruction;
     int parallaldo_id, image_id;
-    // Repeatedly read data from PI_MAIN.
-    // Quit when <0 values read.
     while (1) {
-        PI_Read(g_instructions[id], "%d%d", &parallaldo_id, &image_id);
-        if (parallaldo_id < 0 || image_id < 0) {
-            break;
-        } else {
-            // Run parallaldo searching algorithm.
-            PI_Write(g_results[id], "%d%d%d", -1, -1, -1);
-        }
+        PI_Read(g_instructions[id], "%d%d%d", (int *)&instruction, &parallaldo_id, &image_id);
+        switch (instruction) {
+            case WORKER_TASK:
+                // Run parallaldo searching algorithm.
+                PI_Write(g_results[id], "%d%d%d", -1, -1, -1);
+                break;
+            case WORKER_QUIT:
+                return 0;
+        } 
     }
-    return 0;
 }
 
 int main(int argc, char *argv[])
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
                 // Print out result.
             } else {
                 assigned_process = (assigned_process + 1) % (n_procs - 1);
-                PI_Write(g_instructions[assigned_process], "%d%d", i, j);
+                PI_Write(g_instructions[assigned_process], "%d%d%d", (int)WORKER_TASK, i, j);
                 PI_Read(g_results[assigned_process], "%d%d%d", &y, &x, &r);
                 // Print out result.
             }
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
     // Send signal to workers to stop.
     for (i = 0; i < n_procs - 1; i++) {
-        PI_Write(g_instructions[i], "%d%d", -1, -1);
+        PI_Write(g_instructions[i], "%d%d%d", (int)WORKER_QUIT, -1, -1);
     }
 
     PI_StopMain(0);
