@@ -8,9 +8,17 @@ PI_CHANNEL **results;
 
 int worker(int id, void *p) {
     int parallaldoIndex, imageIndex;
-    PI_Read(instructions[id], "%d%d", &parallaldoIndex, &imageIndex);
-    // Run parallaldo searching algorithm.
-    PI_Write(results[id], "%d%d%d", -1, -1, -1);
+    // Repeatedly read data from PI_MAIN.
+    // Quit when <0 values read.
+    while (1) {
+        PI_Read(instructions[id], "%d%d", &parallaldoIndex, &imageIndex);
+        if (parallaldoIndex < 0 || imageIndex < 0) {
+            break;
+        } else {
+            // Run parallaldo searching algorithm.
+            PI_Write(results[id], "%d%d%d", -1, -1, -1);
+        }
+    }
     return 0;
 }
 
@@ -56,6 +64,11 @@ int main(int argc, char *argv[]) {
                 // Print out result.
             }
         }
+    }
+
+    // Send signal to workers to stop.
+    for (i = 0; i < nProcs - 1; i++) {
+        PI_Write(instructions[i], "%d%d", -1, -1);
     }
 
     PI_StopMain(0);
