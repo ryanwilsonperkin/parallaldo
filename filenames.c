@@ -5,6 +5,7 @@
 
 #include "filenames.h"
 
+// Code adapted from GNU libc manual: https://www.gnu.org/software/libc/manual/html_node/Simple-Directory-Lister.html
 int listFilenames(const char *dir, char ***filenames)
 {
     DIR *dp;
