@@ -3,20 +3,20 @@
 
 #include "filenames.h"
 
-PI_CHANNEL **instructions;
-PI_CHANNEL **results;
+PI_CHANNEL **g_instructions;
+PI_CHANNEL **g_results;
 
 int worker(int id, void *p) {
-    int parallaldoIndex, imageIndex;
+    int parallaldo_id, image_id;
     // Repeatedly read data from PI_MAIN.
     // Quit when <0 values read.
     while (1) {
-        PI_Read(instructions[id], "%d%d", &parallaldoIndex, &imageIndex);
-        if (parallaldoIndex < 0 || imageIndex < 0) {
+        PI_Read(g_instructions[id], "%d%d", &parallaldo_id, &image_id);
+        if (parallaldo_id < 0 || image_id < 0) {
             break;
         } else {
             // Run parallaldo searching algorithm.
-            PI_Write(results[id], "%d%d%d", -1, -1, -1);
+            PI_Write(g_results[id], "%d%d%d", -1, -1, -1);
         }
     }
     return 0;
@@ -24,59 +24,59 @@ int worker(int id, void *p) {
 
 int main(int argc, char *argv[]) {
     int i, j;
-    int nProcs, nParallaldos, nImages;
-    int assignedProcess, x, y, r;
+    int n_procs, n_parallaldos, n_images;
+    int assigned_process, x, y, r;
     char **parallaldos, **images;
     PI_PROCESS **processes;
 
     // Initialize Pilot environment.
-    nProcs = PI_Configure(&argc, &argv);
+    n_procs = PI_Configure(&argc, &argv);
 
     // Get filenames from directories.
-    nParallaldos = listFilenames(argv[1], &parallaldos);
-    nImages = listFilenames(argv[2], &images);
+    n_parallaldos = listFilenames(argv[1], &parallaldos);
+    n_images = listFilenames(argv[2], &images);
 
     // Initialize processes and channels.
-    if (nProcs > 1) {
-        processes = malloc((nProcs - 1) * sizeof(PI_PROCESS *));
-        instructions = malloc((nProcs - 1) * sizeof(PI_CHANNEL *));
-        results = malloc((nProcs - 1) * sizeof(PI_CHANNEL *));
-        for (i = 0; i < nProcs - 1; i++) {
+    if (n_procs > 1) {
+        processes = malloc((n_procs - 1) * sizeof(PI_PROCESS *));
+        g_instructions = malloc((n_procs - 1) * sizeof(PI_CHANNEL *));
+        g_results = malloc((n_procs - 1) * sizeof(PI_CHANNEL *));
+        for (i = 0; i < n_procs - 1; i++) {
             processes[i] = PI_CreateProcess(worker, i, NULL);
-            instructions[i] = PI_CreateChannel(PI_MAIN, processes[i]);
-            results[i] = PI_CreateChannel(processes[i], PI_MAIN);
+            g_instructions[i] = PI_CreateChannel(PI_MAIN, processes[i]);
+            g_results[i] = PI_CreateChannel(processes[i], PI_MAIN);
         }
     }
 
     PI_StartAll();
     
     // Analyze parallaldos and image files.
-    assignedProcess = 0;
-    for (i = 0; i < nParallaldos; i++) {
-        for (j = 0; j < nImages; j++) {
-            if (nProcs == 1) {
+    assigned_process = 0;
+    for (i = 0; i < n_parallaldos; i++) {
+        for (j = 0; j < n_images; j++) {
+            if (n_procs == 1) {
                 // Run parallaldo searching algorithm.
                 // Print out result.
             } else {
-                assignedProcess = (assignedProcess + 1) % (nProcs - 1);
-                PI_Write(instructions[assignedProcess], "%d%d", i, j);
-                PI_Read(results[assignedProcess], "%d%d%d", &y, &x, &r);
+                assigned_process = (assigned_process + 1) % (n_procs - 1);
+                PI_Write(g_instructions[assigned_process], "%d%d", i, j);
+                PI_Read(g_results[assigned_process], "%d%d%d", &y, &x, &r);
                 // Print out result.
             }
         }
     }
 
     // Send signal to workers to stop.
-    for (i = 0; i < nProcs - 1; i++) {
-        PI_Write(instructions[i], "%d%d", -1, -1);
+    for (i = 0; i < n_procs - 1; i++) {
+        PI_Write(g_instructions[i], "%d%d", -1, -1);
     }
 
     PI_StopMain(0);
 
-    freeFilenames(nParallaldos, parallaldos);
-    freeFilenames(nImages, images);
+    freeFilenames(n_parallaldos, parallaldos);
+    freeFilenames(n_images, images);
     free(processes);
-    free(instructions);
-    free(results);
+    free(g_instructions);
+    free(g_results);
     return 0;
 }

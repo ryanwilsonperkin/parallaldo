@@ -10,16 +10,16 @@ int listFilenames(const char *dir, char ***filenames)
 {
     DIR *dp;
     struct dirent *ep;
-    int i, nFiles;
+    int i, n_files;
 
     dp = opendir(dir);
     if (dp != NULL) {
-        nFiles = 0;
+        n_files = 0;
         while (ep = readdir(dp)) {
-            if (ep->d_type == DT_REG) nFiles++;
+            if (ep->d_type == DT_REG) n_files++;
         }
 
-        *filenames = malloc(nFiles * sizeof(char *));
+        *filenames = malloc(n_files * sizeof(char *));
         rewinddir(dp);
 
         i = 0;
@@ -30,17 +30,17 @@ int listFilenames(const char *dir, char ***filenames)
                 i++;
             }
         }
-        return nFiles;
+        return n_files;
     } else {
         fprintf(stderr, "error: Could not open directory %s.\n", dir);
         return 0;
     }
 }
 
-void freeFilenames(int nFiles, char **filenames)
+void freeFilenames(int n_files, char **filenames)
 {
     int i;
-    for (i = 0; i < nFiles; i++) {
+    for (i = 0; i < n_files; i++) {
         free(filenames[i]);
     }
     free(filenames);
