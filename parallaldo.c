@@ -40,3 +40,12 @@ void free_image(Image i)
 {
     free_parallaldo((Parallaldo)i);
 }
+
+Position find_parallaldo(Parallaldo parallaldo, Image image)
+{
+    Position p;
+    p.x = -1;
+    p.y = -1;
+    p.r = -1;
+    return p;
+}
