@@ -3,7 +3,7 @@ PILOTHOME = /home/wgardner/work/pilot
 
 CC = mpicc
 CPPFLAGS += -I$(PILOTHOME)/include
-CFLAGS = -g -O0 -Wall
+CFLAGS = -g -O0 -Wall -std=c99
 LDFLAGS += -L$(PILOTHOME)/lib -lpilot
 
 all: wp

@@ -1,3 +1,6 @@
+// DT_REG is a part of the GNU/BSD extension.
+#define _GNU_SOURCE
+
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
