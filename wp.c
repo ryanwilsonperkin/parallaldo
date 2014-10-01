@@ -32,7 +32,7 @@ int worker(int id, void *p)
                 image = load_image(g_image_files[image_id]);
                 position = find_parallaldo(parallaldo, image);
 
-                PI_Write(g_results[id], "%d%d%d", position.y, position.x, position.r);
+                PI_Write(g_results[id], "%d%d%d%d%d", parallaldo_id, image_id, position.y, position.x, position.r);
 
                 free_parallaldo(parallaldo);
                 free_image(image);
@@ -71,12 +71,19 @@ void serial(int n_parallaldos, int n_images)
 
 void round_robin(int n_procs, int n_parallaldos, int n_images)
 {
+    int recv_parallaldo_id, recv_image_id;
     int current_parallaldo = 0, current_image = 0;
+    int x, y, r, process_id = 0;
+
     for (int i = 0; i < n_parallaldos; i++) {
         for (int j = 0; j < n_images; j++) {
-            assigned_process = (assigned_process + 1) % (n_procs - 1);
-            PI_Write(g_instructions[assigned_process], "%d%d%d", (int)WORKER_TASK, i, j);
-            PI_Read(g_results[assigned_process], "%d%d%d", &y, &x, &r);
+            process_id = (process_id + 1) % (n_procs - 1);
+            PI_Write(g_instructions[process_id], "%d%d%d", (int)WORKER_TASK, i, j);
+            PI_Read(g_results[process_id], "%d%d%d%d%d", &recv_parallaldo_id, &recv_image_id, &y, &x, &r);
+            printf(PRINT_FORMAT, PRINT_PREFIX,
+                   g_parallaldo_files[recv_parallaldo_id],
+                   g_image_files[recv_image_id],
+                   y, x, r);
         }
     }
 }
