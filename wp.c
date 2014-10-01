@@ -10,8 +10,9 @@
 #define PRINT_FORMAT "%c%s %s (%d,%d,%d)\n"
 #define PRINT_PREFIX '$'
 
-PI_CHANNEL **g_instructions;
 PI_CHANNEL **g_results;
+PI_CHANNEL **g_instructions;
+PI_BUNDLE *g_results_bundle;
 char **g_parallaldo_files, **g_image_files;
 
 int worker(int id, void *p)
@@ -71,20 +72,28 @@ void serial(int n_parallaldos, int n_images)
 
 void round_robin(int n_procs, int n_parallaldos, int n_images)
 {
-    int recv_parallaldo_id, recv_image_id;
-    int current_parallaldo = 0, current_image = 0;
-    int x, y, r, process_id = 0;
+    int recv_parallaldo_id, recv_image_id, x, y, r;
+    int num_results = 0, process_id = 0;
 
-    for (int i = 0; i < n_parallaldos; i++) {
-        for (int j = 0; j < n_images; j++) {
-            process_id = (process_id + 1) % (n_procs - 1);
-            PI_Write(g_instructions[process_id], "%d%d%d", (int)WORKER_TASK, i, j);
-            PI_Read(g_results[process_id], "%d%d%d%d%d", &recv_parallaldo_id, &recv_image_id, &y, &x, &r);
-            printf(PRINT_FORMAT, PRINT_PREFIX,
-                   g_parallaldo_files[recv_parallaldo_id],
-                   g_image_files[recv_image_id],
-                   y, x, r);
+    // Evenly distribute instructions to processes.
+    for (int parallaldo_id = 0; parallaldo_id < n_parallaldos; parallaldo_id++) {
+        for (int image_id = 0; image_id < n_images; image_id++) {
+            PI_Write(g_instructions[process_id], "%d%d%d", (int)WORKER_TASK, parallaldo_id, image_id);
+            process_id = (process_id + 1) % n_procs;
         }
+    }
+
+    // Read results from processes.
+    while (num_results < (n_parallaldos * n_images)) {
+
+        // Block until a channel is ready for reading.
+        process_id = PI_Select(g_results_bundle);
+        PI_Read(g_results[process_id], "%d%d%d%d%d", &recv_parallaldo_id, &recv_image_id, &y, &x, &r);
+        printf(PRINT_FORMAT, PRINT_PREFIX,
+               g_parallaldo_files[recv_parallaldo_id],
+               g_image_files[recv_image_id],
+               y, x, r);
+        num_results++;
     }
 }
 
@@ -94,7 +103,6 @@ void load_balanced(int n_procs, int n_parallaldos, int n_images)
 
 int main(int argc, char *argv[])
 {
-    // TODO: Fix round robin function to properly assign tasks.
     // TODO: Implement load_balanced functionality.
     // TODO: Implement find_parallaldo algorithm.
     // TODO: Properly document functions/headers.
@@ -135,6 +143,7 @@ int main(int argc, char *argv[])
             g_instructions[i] = PI_CreateChannel(PI_MAIN, processes[i]);
             g_results[i] = PI_CreateChannel(processes[i], PI_MAIN);
         }
+        g_results_bundle = PI_CreateBundle(PI_SELECT, g_results, (n_procs - 1));
     }
 
     // Begin processing.
@@ -143,9 +152,9 @@ int main(int argc, char *argv[])
     if (n_procs == 1) {
         serial(n_parallaldos, n_images);
     } else if (load_balancer) {
-        load_balanced(n_procs, n_parallaldos, n_images);
+        load_balanced(n_procs - 1, n_parallaldos, n_images);
     } else {
-        round_robin(n_procs, n_parallaldos, n_images);
+        round_robin(n_procs - 1, n_parallaldos, n_images);
     }
 
     // If running in parallel, instruct worker processes to stop.
