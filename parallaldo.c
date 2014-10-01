@@ -29,3 +29,14 @@ void free_parallaldo(Parallaldo p)
     }
     free(p.pixels);
 }
+
+
+Image load_image(const char *filename)
+{
+    return (Image)load_parallaldo(filename);
+}
+
+void free_image(Image i)
+{
+    free_parallaldo((Parallaldo)i);
+}
