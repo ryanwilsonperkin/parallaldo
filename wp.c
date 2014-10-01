@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "filenames.h"
+#include "parallaldo.h"
 #include "wp.h"
 
 PI_CHANNEL **g_instructions;
