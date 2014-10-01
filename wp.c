@@ -44,17 +44,56 @@ int worker(int id, void *p)
     }
 }
 
+void serial(int n_parallaldos, int n_images)
+{
+    for (int i = 0; i < n_parallaldos; i++) {
+        for (int j = 0; j < n_images; j++) {
+
+            Parallaldo parallaldo = load_parallaldo(g_parallaldo_files[i]);
+            Image image = load_image(g_image_files[j]);
+            Position position = find_parallaldo(parallaldo, image);
+
+            if (position.y >= 0 && position.x >= 0 && position.r >= 0) {
+                printf(PRINT_FORMAT,
+                        PRINT_PREFIX,
+                        g_parallaldo_files[i],
+                        g_image_files[j],
+                        position.y,
+                        position.x,
+                        position.r);
+            }
+
+            free_parallaldo(parallaldo);
+            free_image(image);
+        }
+    }
+}
+
+void round_robin(int n_procs, int n_parallaldos, int n_images)
+{
+    int current_parallaldo = 0, current_image = 0;
+    for (int i = 0; i < n_parallaldos; i++) {
+        for (int j = 0; j < n_images; j++) {
+            assigned_process = (assigned_process + 1) % (n_procs - 1);
+            PI_Write(g_instructions[assigned_process], "%d%d%d", (int)WORKER_TASK, i, j);
+            PI_Read(g_results[assigned_process], "%d%d%d", &y, &x, &r);
+        }
+    }
+}
+
+void load_balanced(int n_procs, int n_parallaldos, int n_images)
+{
+}
+
 int main(int argc, char *argv[])
 {
+    // TODO: Fix round robin function to properly assign tasks.
+    // TODO: Implement load_balanced functionality.
     // TODO: Implement find_parallaldo algorithm.
     // TODO: Properly document functions/headers.
     // TODO: Add license comment at top of each header file.
     PI_PROCESS **processes;
-    Parallaldo parallaldo;
-    Image image;
-    Position position;
     int n_procs, n_parallaldos, n_images;
-    int assigned_process, x, y, r;
     char *parallaldo_dir, *image_dir;
     boolean load_balancer;
 
@@ -94,35 +133,12 @@ int main(int argc, char *argv[])
     // Begin processing.
     PI_StartAll();
 
-    // Search image files for parallaldos.
-    assigned_process = 0;
-    for (int i = 0; i < n_parallaldos; i++) {
-        for (int j = 0; j < n_images; j++) {
-
-            // If PI_MAIN is the only process, run the find algorithm directly.
-            if (n_procs == 1) {
-                parallaldo = load_parallaldo(g_parallaldo_files[i]);
-                image = load_image(g_image_files[j]);
-                position = find_parallaldo(parallaldo, image);
-                y = position.y;
-                x = position.x;
-                r = position.r;
-
-                free_parallaldo(parallaldo);
-                free_image(image);
-
-            // If running in parallel, instruct worker processes to run the algorithm.
-            } else {
-                assigned_process = (assigned_process + 1) % (n_procs - 1);
-                PI_Write(g_instructions[assigned_process], "%d%d%d", (int)WORKER_TASK, i, j);
-                PI_Read(g_results[assigned_process], "%d%d%d", &y, &x, &r);
-            }
-
-            // If y, x, and r are valid, print them according to PRINT_FORMAT specification.
-            if (y >= 0 && x >= 0 && r >= 0) {
-                printf(PRINT_FORMAT, PRINT_PREFIX, g_parallaldo_files[i], g_image_files[j], y, x, r);
-            }
-        }
+    if (n_procs == 1) {
+        serial(n_parallaldos, n_images);
+    } else if (load_balancer) {
+        load_balanced(n_procs, n_parallaldos, n_images);
+    } else {
+        round_robin(n_procs, n_parallaldos, n_images);
     }
 
     // If running in parallel, instruct worker processes to stop.
