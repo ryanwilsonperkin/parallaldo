@@ -45,6 +45,10 @@ int worker(int id, void *p)
 
 int main(int argc, char *argv[])
 {
+    // TODO: Handle '-b' flag for load balancing.
+    // TODO: Implement find_parallaldo algorithm.
+    // TODO: Properly document functions/headers.
+    // TODO: Add license comment at top of each header file.
     PI_PROCESS **processes;
     Parallaldo parallaldo;
     Image image;
@@ -105,7 +109,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    // Send signal to worker processes (if any) to stop.
+    // If running in parallel, instruct worker processes to stop.
     for (int i = 0; i < n_procs - 1; i++) {
         PI_Write(g_instructions[i], "%d%d%d", (int)WORKER_QUIT, -1, -1);
     }
