@@ -1,6 +1,7 @@
 #include <pilot.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "filenames.h"
 #include "parallaldo.h"
@@ -45,7 +46,6 @@ int worker(int id, void *p)
 
 int main(int argc, char *argv[])
 {
-    // TODO: Handle '-b' flag for load balancing.
     // TODO: Implement find_parallaldo algorithm.
     // TODO: Properly document functions/headers.
     // TODO: Add license comment at top of each header file.
@@ -55,13 +55,29 @@ int main(int argc, char *argv[])
     Position position;
     int n_procs, n_parallaldos, n_images;
     int assigned_process, x, y, r;
+    char *parallaldo_dir, *image_dir;
+    boolean load_balancer;
 
     // Initialize Pilot environment.
     n_procs = PI_Configure(&argc, &argv);
 
+    // Parse command line arguments.
+    if (argc == 4 && strcmp(argv[1], "-b") == 0) {
+        load_balancer = TRUE;
+        parallaldo_dir = argv[2];
+        image_dir = argv[3];
+    } else if (argc == 3) {
+        load_balancer = FALSE;
+        parallaldo_dir = argv[1];
+        image_dir = argv[2];
+    } else {
+        fprintf(stderr, "usage: wp [-b] parallaldodir imagedir\n");
+        return 1;
+    }
+
     // Get filenames from directories.
-    n_parallaldos = listFilenames(argv[1], &g_parallaldo_files);
-    n_images = listFilenames(argv[2], &g_image_files);
+    n_parallaldos = listFilenames(parallaldo_dir, &g_parallaldo_files);
+    n_images = listFilenames(image_dir, &g_image_files);
 
     // Initialize processes and channels.
     if (n_procs > 1) {
