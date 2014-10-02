@@ -8,6 +8,8 @@
 #include "parallaldo.h"
 #include "wp.h"
 
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
 #define PRINT_FORMAT "%c%s %s (%d,%d,%d)\n"
 #define PRINT_PREFIX '$'
 
@@ -122,14 +124,14 @@ void round_robin(int n_procs, int n_parallaldos, int n_images)
  *  While looping, send out new instructions to processes that return results.
  *  Print out any returned results.
  */
-// TODO: Handle edge case where n_procs > (n_parallaldos * n_images)
 void load_balanced(int n_procs, int n_parallaldos, int n_images)
 {
     int recv_parallaldo_id, recv_image_id, x, y, r;
     int parallaldo_id = 0, image_id = 0;
     int num_results = 0, num_sent = 0, process_id = 0;
+    int total = n_parallaldos * n_images;
 
-    for ( ; process_id < n_procs; process_id++) {
+    for ( ; process_id < MIN(n_procs, total); process_id++) {
         PI_Write(g_instructions[process_id], "%d%d%d", (int)WORKER_TASK, parallaldo_id, image_id);
         num_sent++;
 
@@ -137,7 +139,7 @@ void load_balanced(int n_procs, int n_parallaldos, int n_images)
         image_id = (image_id + 1) % n_images; 
     }
 
-    while (num_results < (n_parallaldos * n_images)) {
+    while (num_results < total) {
         process_id = PI_Select(g_results_bundle);
         PI_Read(g_results[process_id], "%d%d%d%d%d", &recv_parallaldo_id, &recv_image_id, &y, &x, &r);
         if (y && x) {
@@ -148,7 +150,7 @@ void load_balanced(int n_procs, int n_parallaldos, int n_images)
         }
         num_results++;
 
-        if (num_sent < (n_parallaldos * n_images)) {
+        if (num_sent < total) {
             PI_Write(g_instructions[process_id], "%d%d%d", (int)WORKER_TASK, parallaldo_id, image_id);
             parallaldo_id += (image_id + 1) / n_images;
             image_id = (image_id + 1) % n_images; 
