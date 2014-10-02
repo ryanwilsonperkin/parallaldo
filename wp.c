@@ -167,10 +167,9 @@ void load_balanced(int n_procs, int n_parallaldos, int n_images)
  *  parallaldodir: the directory to load Parallaldo files from
  *  imagedir: the directory to load Image files from
  */
-// TODO: Don't free processes if running in serial.
 int main(int argc, char *argv[])
 {
-    PI_PROCESS **processes;
+    PI_PROCESS **processes = NULL;
     int n_procs, n_parallaldos, n_images;
     char *parallaldo_dir, *image_dir;
     boolean load_balancer;
