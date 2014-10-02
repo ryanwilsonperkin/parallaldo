@@ -99,11 +99,42 @@ void round_robin(int n_procs, int n_parallaldos, int n_images)
 
 void load_balanced(int n_procs, int n_parallaldos, int n_images)
 {
+    int recv_parallaldo_id, recv_image_id, x, y, r;
+    int parallaldo_id = 0, image_id = 0;
+    int num_results = 0, process_id = 0;
+
+    for ( ; process_id < n_procs; process_id++) {
+        PI_Write(g_instructions[process_id], "%d%d%d", (int)WORKER_TASK, parallaldo_id, image_id);
+
+        // Increment parallaldo_id and image_id.
+        parallaldo_id += (image_id + 1) / n_images;
+        image_id = (image_id + 1) % n_images; 
+    }
+
+    while (num_results < (n_parallaldos * n_images)) {
+
+        // Block until a channel is ready for reading.
+        process_id = PI_Select(g_results_bundle);
+        PI_Read(g_results[process_id], "%d%d%d%d%d", &recv_parallaldo_id, &recv_image_id, &y, &x, &r);
+        printf(PRINT_FORMAT, PRINT_PREFIX,
+               g_parallaldo_files[recv_parallaldo_id],
+               g_image_files[recv_image_id],
+               y, x, r);
+        num_results++;
+
+        // Only write if not all results have been returned.
+        if (num_results <= (n_parallaldos * n_images) - n_procs) {
+            PI_Write(g_instructions[process_id], "%d%d%d", (int)WORKER_TASK, parallaldo_id, image_id);
+        }
+
+        // Increment parallaldo_id and image_id.
+        parallaldo_id += (image_id + 1) / n_images;
+        image_id = (image_id + 1) % n_images; 
+    }
 }
 
 int main(int argc, char *argv[])
 {
-    // TODO: Implement load_balanced functionality.
     // TODO: Implement find_parallaldo algorithm.
     // TODO: Properly document functions/headers.
     // TODO: Add license comment at top of each header file.
