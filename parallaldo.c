@@ -11,7 +11,6 @@
  *  Additional lines are width + 1 long (newline terminated) and read into pixels as strings.
  */
 // TODO: Print error if file couldn't open.
-// TODO: Close file.
 Parallaldo load_parallaldo(const char *filename)
 {
     int i;
@@ -34,6 +33,7 @@ Parallaldo load_parallaldo(const char *filename)
             fscanf(f, "%s ", p.pixels[i]);
             p.pixels[i][p.width] = '\0';
         }
+        fclose(f);
     }
     return p;
 }
