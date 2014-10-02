@@ -90,11 +90,10 @@ void serial(int n_parallaldos, int n_images)
  *  While looping, block until a process returns a result.
  *  Print out any returned results.
  */
-// TODO: Determine whether PI_Select still constitutes round robin method.
 void round_robin(int n_procs, int n_parallaldos, int n_images)
 {
     int recv_parallaldo_id, recv_image_id, y, x, r;
-    int num_results = 0, process_id = 0;
+    int process_id = 0;
 
     for (int parallaldo_id = 0; parallaldo_id < n_parallaldos; parallaldo_id++) {
         for (int image_id = 0; image_id < n_images; image_id++) {
@@ -103,16 +102,18 @@ void round_robin(int n_procs, int n_parallaldos, int n_images)
         }
     }
 
-    while (num_results < (n_parallaldos * n_images)) {
-        process_id = PI_Select(g_results_bundle);
-        PI_Read(g_results[process_id], "%d%d%d%d%d", &recv_parallaldo_id, &recv_image_id, &y, &x, &r);
-        if (y && x) {
-            printf(PRINT_FORMAT, PRINT_PREFIX,
-                   g_parallaldo_files[recv_parallaldo_id],
-                   g_image_files[recv_image_id],
-                   y, x, r);
+    process_id = 0;
+    for (int parallaldo_id = 0; parallaldo_id < n_parallaldos; parallaldo_id++) {
+        for (int image_id = 0; image_id < n_images; image_id++) {
+            PI_Read(g_results[process_id], "%d%d%d%d%d", &recv_parallaldo_id, &recv_image_id, &y, &x, &r);
+            if (y && x) {
+                printf(PRINT_FORMAT, PRINT_PREFIX,
+                       g_parallaldo_files[recv_parallaldo_id],
+                       g_image_files[recv_image_id],
+                       y, x, r);
+            }
+            process_id = (process_id + 1) % n_procs;
         }
-        num_results++;
     }
 }
 
