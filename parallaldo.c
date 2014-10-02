@@ -3,6 +3,16 @@
 
 #include "parallaldo.h"
 
+/*
+ * load_parallaldo
+ *  Try to open filename file and read data into Parallaldo.
+ *  First two integers (separated by a single space) are the height and width.
+ *  Reads "height" number of additional lines.
+ *  Additional lines are width + 1 long (newline terminated) and read into pixels as strings.
+ */
+// TODO: Print error if file couldn't open.
+// TODO: Handle out of memory error.
+// TODO: Close file.
 Parallaldo load_parallaldo(const char *filename)
 {
     int i;
@@ -21,26 +31,44 @@ Parallaldo load_parallaldo(const char *filename)
     return p;
 }
 
+/*
+ * free_parallaldo
+ *  Free each string in pixels list.
+ *  Free pixels list.
+ */
+// TODO: Handle freeing NULL.
 void free_parallaldo(Parallaldo p)
 {
-    int i;
-    for (i = 0; i < p.height; i++) {
+    for (int i = 0; i < p.height; i++) {
         free((p.pixels)[i]);
     }
     free(p.pixels);
 }
 
-
+/*
+ * load_image
+ *  Images are isomorphic to Parallaldos, so defer to load_parallaldo and cast result to Image.
+ */
 Image load_image(const char *filename)
 {
     return (Image)load_parallaldo(filename);
 }
 
+/*
+ * free_image
+ *  Images are isomorphic to Parallaldos, so defer to free_parallaldo and cast parameter to Parallaldo.
+ */
 void free_image(Image i)
 {
     free_parallaldo((Parallaldo)i);
 }
 
+/*
+ * find_parallaldo
+ *  Algorithm not yet defined.
+ */
+// TODO: Implement algorithm.
+// TODO: Default position x,y,r should be 0.
 Position find_parallaldo(Parallaldo parallaldo, Image image)
 {
     Position p;

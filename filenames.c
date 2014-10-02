@@ -8,7 +8,12 @@
 
 #include "filenames.h"
 
-// Combine directory and file name, allocate space.
+/*
+ * get_relative_filename
+ *  Calculate and allocate needed space for a new string combining dir and filename.
+ *  Concatenate dir, '/', and filename, and return the resulting string.
+ */
+// TODO: Handle out of memory error.
 char *get_relative_filename(const char *dir, const char *filename)
 {
     int dir_length = strlen(dir);
@@ -21,21 +26,25 @@ char *get_relative_filename(const char *dir, const char *filename)
     return relative_filename;
 }
 
-// Code adapted from GNU libc manual: https://www.gnu.org/software/libc/manual/html_node/Simple-Directory-Lister.html
-int listFilenames(const char *dir, char ***filenames)
+/*
+ * list_filename
+ *  Count number of files in dir, allocate same number of strings in filenames list.
+ *  Read name of each file in dir and add relative filename string to list.
+ *  note: adapted from GNU libc manual: https://www.gnu.org/software/libc/manual/html_node/Simple-Directory-Lister.html
+ */
+// TODO: Handle out of memory error.
+int list_filenames(const char *dir, char ***filenames)
 {
     DIR *dp;
     struct dirent *ep;
     int i, n_files;
 
-    // Try to open directory.
     dp = opendir(dir);
     if (dp == NULL) {
         fprintf(stderr, "error: Could not open directory %s.\n", dir);
         return 0;
     }
 
-    // Increment number of files for each DT_REG entity found.
     n_files = 0;
     while (ep = readdir(dp)) {
         if (ep->d_type == DT_REG) {
@@ -43,13 +52,9 @@ int listFilenames(const char *dir, char ***filenames)
         }
     }
 
-    // Allocate a string pointer for each filename.
     *filenames = malloc(n_files * sizeof(char *));
-
-    // Return to first entity in directory listing.
     rewinddir(dp);
 
-    // Allocate filename for each DT_REG entity found.
     i = 0;
     while (ep = readdir(dp)) {
         if (ep->d_type == DT_REG) {
@@ -57,15 +62,20 @@ int listFilenames(const char *dir, char ***filenames)
             i++;
         }
     }
+
     closedir(dp);
     return n_files;
 }
 
-// Free space allocated to list of filenames.
-void freeFilenames(int n_files, char **filenames)
+/* 
+ * free_filename
+ *  Free each string in filenames list.
+ *  Free filenames list.
+ */
+// TODO: Handle freeing NULL.
+void free_filenames(int n_files, char **filenames)
 {
-    int i;
-    for (i = 0; i < n_files; i++) {
+    for (int i = 0; i < n_files; i++) {
         free(filenames[i]);
     }
     free(filenames);
