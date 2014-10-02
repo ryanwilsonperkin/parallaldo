@@ -23,7 +23,7 @@ char **g_image_files;           // global list of image file names
  *  When WORKER_TASK is received, perform find_parallaldo search using supplied parallaldo_id and image_id.
  *  Return parallaldo_id, image_id, and resulting Position to PI_MAIN.
  */
-// TODO: Use pragma define to ignore unused value p.
+#pragma diag_suppress 869  // Suppress remarks for 'parameter unreferenced' remark. 
 int worker(int id, void *p)
 {
     enum WorkerInstruction instruction;
@@ -48,6 +48,8 @@ int worker(int id, void *p)
         } 
     }
 }
+#pragma diag_default 869  // Un-suppress remarks for 'parameter unreferenced' remark. 
+
 
 /*
  * serial
