@@ -13,13 +13,16 @@
  *  Calculate and allocate needed space for a new string combining dir and filename.
  *  Concatenate dir, '/', and filename, and return the resulting string.
  */
-// TODO: Handle out of memory error.
 char *get_relative_filename(const char *dir, const char *filename)
 {
     int dir_length = strlen(dir);
     int filename_length = strlen(filename);
 
     char *relative_filename = malloc((dir_length + filename_length + 2) * sizeof(char));
+    if (relative_filename == NULL) {
+        fprintf(stderr, "error: get_relative_filename: can't initialize relative_filename, out of memory.\n");
+        exit(EXIT_FAILURE);
+    }
     relative_filename = strcpy(relative_filename, dir);
     relative_filename = strcat(relative_filename, "/");
     relative_filename = strcat(relative_filename, filename);
@@ -32,7 +35,6 @@ char *get_relative_filename(const char *dir, const char *filename)
  *  Read name of each file in dir and add relative filename string to list.
  *  note: adapted from GNU libc manual: https://www.gnu.org/software/libc/manual/html_node/Simple-Directory-Lister.html
  */
-// TODO: Handle out of memory error.
 int list_filenames(const char *dir, char ***filenames)
 {
     DIR *dp;
@@ -53,6 +55,10 @@ int list_filenames(const char *dir, char ***filenames)
     }
 
     *filenames = malloc(n_files * sizeof(char *));
+    if (filenames == NULL) {
+        fprintf(stderr, "error: list_filenames: can't initialize filenames, out of memory.\n");
+        exit(EXIT_FAILURE);
+    }
     rewinddir(dp);
 
     i = 0;
@@ -72,7 +78,6 @@ int list_filenames(const char *dir, char ***filenames)
  *  Free each string in filenames list.
  *  Free filenames list.
  */
-// TODO: Handle freeing NULL.
 void free_filenames(int n_files, char **filenames)
 {
     for (int i = 0; i < n_files; i++) {

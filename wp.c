@@ -168,8 +168,6 @@ void load_balanced(int n_procs, int n_parallaldos, int n_images)
  *  imagedir: the directory to load Image files from
  */
 // TODO: Don't free processes if running in serial.
-// TODO: Handle out of memory error.
-// TODO: Handle freeing NULL.
 int main(int argc, char *argv[])
 {
     PI_PROCESS **processes;
@@ -201,8 +199,23 @@ int main(int argc, char *argv[])
     // Initialize processes and channels.
     if (n_procs > 1) {
         processes = malloc((n_procs - 1) * sizeof(PI_PROCESS *));
+        if (processes == NULL) {
+            fprintf(stderr, "error: main: can't initialize processes, out of memory.\n");
+            exit(EXIT_FAILURE);
+        }
+
         g_instructions = malloc((n_procs - 1) * sizeof(PI_CHANNEL *));
+        if (g_instructions == NULL) {
+            fprintf(stderr, "error: main: can't initialize g_instructions, out of memory.\n");
+            exit(EXIT_FAILURE);
+        }
+
         g_results = malloc((n_procs - 1) * sizeof(PI_CHANNEL *));
+        if (g_results == NULL) {
+            fprintf(stderr, "error: main: can't initialize g_results, out of memory.\n");
+            exit(EXIT_FAILURE);
+        }
+
         for (int i = 0; i < n_procs - 1; i++) {
             processes[i] = PI_CreateProcess(worker, i, NULL);
             g_instructions[i] = PI_CreateChannel(PI_MAIN, processes[i]);

@@ -11,7 +11,6 @@
  *  Additional lines are width + 1 long (newline terminated) and read into pixels as strings.
  */
 // TODO: Print error if file couldn't open.
-// TODO: Handle out of memory error.
 // TODO: Close file.
 Parallaldo load_parallaldo(const char *filename)
 {
@@ -22,8 +21,16 @@ Parallaldo load_parallaldo(const char *filename)
     if (f) {
         fscanf(f, "%d %d", &(p.height), &(p.width));
         p.pixels = malloc(p.height * sizeof(char *));
+        if (p.pixels == NULL) {
+            fprintf(stderr, "error: load_parallaldo: can't initialize p.pixels, out of memory.\n");
+            exit(EXIT_FAILURE);
+        }
         for (i = 0; i < p.height; i++) {
             p.pixels[i] = malloc((p.width + 1) * sizeof(char));
+            if (p.pixels[i] == NULL) {
+                fprintf(stderr, "error: load_parallaldo: can't initialize p.pixels[%d], out of memory.\n", i);
+                exit(EXIT_FAILURE);
+            }
             fscanf(f, "%s ", p.pixels[i]);
             p.pixels[i][p.width] = '\0';
         }
@@ -36,7 +43,6 @@ Parallaldo load_parallaldo(const char *filename)
  *  Free each string in pixels list.
  *  Free pixels list.
  */
-// TODO: Handle freeing NULL.
 void free_parallaldo(Parallaldo p)
 {
     for (int i = 0; i < p.height; i++) {
