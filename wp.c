@@ -23,23 +23,19 @@ char **g_image_files;           // global list of image file names
  *  When WORKER_TASK is received, perform find_parallaldo search using supplied parallaldo_id and image_id.
  *  Return parallaldo_id, image_id, and resulting Position to PI_MAIN.
  */
-// TODO: Move Parallaldo, Image, Position declaration within case statement.
 // TODO: Use pragma define to ignore unused value p.
 int worker(int id, void *p)
 {
     enum WorkerInstruction instruction;
-    Parallaldo parallaldo;
-    Image image;
-    Position position;
     int parallaldo_id, image_id;
 
     while (1) {
         PI_Read(g_instructions[id], "%d%d%d", (int *)&instruction, &parallaldo_id, &image_id);
         switch (instruction) {
             case WORKER_TASK: {
-                parallaldo = load_parallaldo(g_parallaldo_files[parallaldo_id]);
-                image = load_image(g_image_files[image_id]);
-                position = find_parallaldo(parallaldo, image);
+                Parallaldo parallaldo = load_parallaldo(g_parallaldo_files[parallaldo_id]);
+                Image image = load_image(g_image_files[image_id]);
+                Position position = find_parallaldo(parallaldo, image);
 
                 PI_Write(g_results[id], "%d%d%d%d%d", parallaldo_id, image_id, position.y, position.x, position.r);
 
