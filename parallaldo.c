@@ -10,7 +10,6 @@
  *  Reads "height" number of additional lines.
  *  Additional lines are width + 1 long (newline terminated) and read into pixels as strings.
  */
-// TODO: Print error if file couldn't open.
 Parallaldo load_parallaldo(const char *filename)
 {
     int i;
@@ -34,6 +33,9 @@ Parallaldo load_parallaldo(const char *filename)
             p.pixels[i][p.width] = '\0';
         }
         fclose(f);
+    } else {
+        fprintf(stderr, "error: load_parallaldo: could not open file %s for read.\n", filename);
+        exit(EXIT_FAILURE);
     }
     return p;
 }
