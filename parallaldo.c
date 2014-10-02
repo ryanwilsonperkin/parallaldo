@@ -76,12 +76,11 @@ void free_image(Image i)
  *  Algorithm not yet defined.
  */
 // TODO: Implement algorithm.
-// TODO: Default position x,y,r should be 0.
 Position find_parallaldo(Parallaldo parallaldo, Image image)
 {
     Position p;
-    p.x = -1;
-    p.y = -1;
-    p.r = -1;
+    p.x = 0;
+    p.y = 0;
+    p.r = 0;
     return p;
 }

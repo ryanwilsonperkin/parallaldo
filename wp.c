@@ -55,7 +55,6 @@ int worker(int id, void *p)
  *  Load each Parallaldo and Image and perform find_parallaldo algorithm.
  *  Print out results.
  */ 
-// TODO: Test position.y && position.x not position.r
 void serial(int n_parallaldos, int n_images)
 {
     for (int i = 0; i < n_parallaldos; i++) {
@@ -64,7 +63,7 @@ void serial(int n_parallaldos, int n_images)
             Image image = load_image(g_image_files[j]);
             Position position = find_parallaldo(parallaldo, image);
 
-            if (position.y >= 0 && position.x >= 0 && position.r >= 0) {
+            if (position.y && position.x) {
                 printf(PRINT_FORMAT,
                         PRINT_PREFIX,
                         g_parallaldo_files[i],
@@ -103,10 +102,12 @@ void round_robin(int n_procs, int n_parallaldos, int n_images)
     while (num_results < (n_parallaldos * n_images)) {
         process_id = PI_Select(g_results_bundle);
         PI_Read(g_results[process_id], "%d%d%d%d%d", &recv_parallaldo_id, &recv_image_id, &y, &x, &r);
-        printf(PRINT_FORMAT, PRINT_PREFIX,
-               g_parallaldo_files[recv_parallaldo_id],
-               g_image_files[recv_image_id],
-               y, x, r);
+        if (y && x) {
+            printf(PRINT_FORMAT, PRINT_PREFIX,
+                   g_parallaldo_files[recv_parallaldo_id],
+                   g_image_files[recv_image_id],
+                   y, x, r);
+        }
         num_results++;
     }
 }
@@ -137,10 +138,12 @@ void load_balanced(int n_procs, int n_parallaldos, int n_images)
     while (num_results < (n_parallaldos * n_images)) {
         process_id = PI_Select(g_results_bundle);
         PI_Read(g_results[process_id], "%d%d%d%d%d", &recv_parallaldo_id, &recv_image_id, &y, &x, &r);
-        printf(PRINT_FORMAT, PRINT_PREFIX,
-               g_parallaldo_files[recv_parallaldo_id],
-               g_image_files[recv_image_id],
-               y, x, r);
+        if (y && x) {
+            printf(PRINT_FORMAT, PRINT_PREFIX,
+                   g_parallaldo_files[recv_parallaldo_id],
+                   g_image_files[recv_image_id],
+                   y, x, r);
+        }
         num_results++;
 
         if (num_sent < (n_parallaldos * n_images)) {
