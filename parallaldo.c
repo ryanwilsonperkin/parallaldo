@@ -10,6 +10,7 @@
  *  Reads "height" number of additional lines.
  *  Additional lines are width + 1 long (newline terminated) and read into pixels as strings.
  */
+// TODO: Pass in directory in order to lookup filename.
 Parallaldo load_parallaldo(const char *filename)
 {
     int i;

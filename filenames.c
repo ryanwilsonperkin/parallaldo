@@ -13,6 +13,7 @@
  *  Calculate and allocate needed space for a new string combining dir and filename.
  *  Concatenate dir, '/', and filename, and return the resulting string.
  */
+// TODO: Remote get_relative_filename, filenames should not have directory.
 char *get_relative_filename(const char *dir, const char *filename)
 {
     int dir_length = strlen(dir);
