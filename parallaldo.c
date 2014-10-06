@@ -75,12 +75,49 @@ void free_image(Image i)
  * find_parallaldo
  *  Algorithm not yet defined.
  */
-// TODO: Implement algorithm.
+// TODO: Improve algorithm.
 Position find_parallaldo(Parallaldo parallaldo, Image image)
 {
-    Position p;
-    p.x = 0;
-    p.y = 0;
-    p.r = 0;
-    return p;
+    int found;
+    for (int iy = 0; iy < image.height - parallaldo.height; iy++) {
+        for (int ix = 0; ix < image.width - parallaldo.width; ix++) {
+            found = 1;
+            for (int py = 0; py < parallaldo.height; py++) {
+                for (int px = 0; px < parallaldo.width; px++) {
+                    int y_offset = py, x_offset = px;
+                    if (parallaldo.pixels[py][px] != image.pixels[iy + y_offset][ix + x_offset]) found = 0;
+                }
+            }
+            if (found) return (Position){iy + 1, ix + 1, 0};
+            found = 1;
+            for (int py = parallaldo.height - 1; py >= 0; py--) {
+                for (int px = parallaldo.width - 1; px >= 0; px--) {
+                    int y_offset = parallaldo.height - 1 - py, x_offset = parallaldo.width - 1 - px;
+                    if (parallaldo.pixels[py][px] != image.pixels[iy + y_offset][ix + x_offset]) found = 0;
+                }
+            }
+            if (found) return (Position){iy + parallaldo.height, ix + parallaldo.width, 180};
+        }
+    }
+    for (int iy = 0; iy < image.height - parallaldo.width; iy++) {
+        for (int ix = 0; ix < image.width - parallaldo.height; ix++) {
+            found = 1;
+            for (int py = 0; py < parallaldo.width; py++) {
+                for (int px = parallaldo.height - 1; px >= 0; px--) {
+                    int y_offset = py, x_offset = parallaldo.height - 1 - px;
+                    if (parallaldo.pixels[px][py] != image.pixels[iy + y_offset][ix + x_offset]) found = 0;
+                }
+            }
+            if (found) return (Position){iy + 1, ix + parallaldo.height, 90};
+            found = 1;
+            for (int py = parallaldo.width - 1; py >= 0; py--) {
+                for (int px = 0; px < parallaldo.height; px++) {
+                    int y_offset = parallaldo.width - 1 - py, x_offset =  px;
+                    if (parallaldo.pixels[px][py] != image.pixels[iy + y_offset][ix + x_offset]) found = 0;
+                }
+            }
+            if (found) return (Position){iy + parallaldo.width, ix + 1, 270};
+        }
+    }
+    return (Position){0,0,0};
 }
