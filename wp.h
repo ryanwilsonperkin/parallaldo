@@ -1,10 +1,10 @@
 #ifndef PARALLALDO_WP_H
 #define PARALLALDO_WP_H
 
-#define TRUE 1
-#define FALSE 0
+#define true 1
+#define false 0
 
-typedef int boolean;
+typedef int bool;
 
 /*
  * enum WorkerInstruction
