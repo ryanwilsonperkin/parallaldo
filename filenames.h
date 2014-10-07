@@ -1,3 +1,10 @@
+/*
+ * filenames.h
+ *  Functions for dealing with directories and lists of filenames.
+ *
+ *  author: Ryan Wilson-Perkin
+ *  student number: 0719644
+ */ 
 #ifndef PARALLALDO_FILENAMES_H
 #define PARALLALDO_FILENAMES_H
 

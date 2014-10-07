@@ -1,3 +1,13 @@
+##
+ # Makefile
+ #  Compile and link the "Where's Parallaldo" program.
+ #  
+ #  usage: make all
+ #  clean: make clean
+ #
+ #  author: Ryan Wilson-Perkin
+ #  student number: 0719644
+ # 
 # Override with PILOTHOME=... make
 PILOTHOME = /home/wgardner/work/pilot
 

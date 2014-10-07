@@ -1,3 +1,10 @@
+/*
+ * parallaldo.h
+ *  Functions for dealing with Parallaldos, Positions, and Images.
+ *
+ *  author: Ryan Wilson-Perkin
+ *  student number: 0719644
+ */ 
 #ifndef PARALLALDO_PARALLALDO_H
 #define PARALLALDO_PARALLALDO_H
 

@@ -1,3 +1,10 @@
+/*
+ * parallaldo.c
+ *  Functions for dealing with Parallaldos, Positions, and Images.
+ *
+ *  author: Ryan Wilson-Perkin
+ *  student number: 0719644
+ */ 
 #include <stdio.h>
 #include <stdlib.h>
 

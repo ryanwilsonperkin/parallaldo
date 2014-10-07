@@ -1,3 +1,10 @@
+/*
+ * filenames.c
+ *  Functions for dealing with directories and lists of filenames.
+ *
+ *  author: Ryan Wilson-Perkin
+ *  student number: 0719644
+ */ 
 // DT_REG is a part of the GNU/BSD extension.
 #define _GNU_SOURCE
 

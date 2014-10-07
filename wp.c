@@ -1,5 +1,14 @@
+/*
+ * wp.c
+ *  Searches for a set of Parallaldos in a set of Images.
+ *  Prints the location and orientation of any Parallaldos found within any Images.
+ *  Capable of running search serially on a single process, or in parallel across many.
+ *  
+ *  usage: wp [-b] parallaldodir imagedir
+ *  author: Ryan Wilson-Perkin
+ *  student number: 0719644
+ */ 
 // TODO: (Possbily) get rid of extraneous globals.
-// TODO: Add license comment at top of each header file.
 #include <pilot.h>
 #include <stdio.h>
 #include <stdlib.h>
