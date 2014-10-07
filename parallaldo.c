@@ -76,8 +76,10 @@ void free_image(Image i)
 
 /*
  * test_location
+ *  Iterates over every pixel in p for given rotation, checking against pixels in i.
+ *  Returns true iff every pixel in p matches overlapping pixel in i.
+ *  Calculates iterator pattern based on rotation.
  */
-// TODO: Add to parallaldo.h and document.
 bool test_location(Parallaldo p, Image i, int iy, int ix, int rotation)
 {
     int py_start, py_end, py_step, px_start, px_end, px_step;

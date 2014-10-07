@@ -85,6 +85,20 @@ Image load_image(const char *dir, const char *filename);
 void free_image(Image i);
 
 /*
+ * test_location
+ *  Tests that rotation of Parallaldo matches Image starting at given indices.
+ *
+ *  p: the Parallaldo to test
+ *  i: the Image to test
+ *  iy: the starting height index of the Image
+ *  ix: the starting width index of the Image
+ *  rotation: the clockwise rotation of the Parallaldo (one of 0, 90, 180, 270)
+ *
+ *  returns: true if Parallaldo matches, false otherwise
+ */
+bool test_location(Parallaldo p, Image i, int iy, int ix, int rotation);
+
+/*
  * find_parallaldo
  *  Find a Parallaldo (if it exists) within an Image.
  *
