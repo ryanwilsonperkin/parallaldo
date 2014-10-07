@@ -1,4 +1,3 @@
-// TODO: Include timing functions for measuring runtime.
 // TODO: (Possbily) get rid of extraneous globals.
 // TODO: Add license comment at top of each header file.
 #include <pilot.h>
@@ -232,6 +231,7 @@ int main(int argc, char *argv[])
 
     // Begin processing.
     PI_StartAll();
+    PI_StartTime();
 
     // Select search method from serial, load_balanced, or round_robin.
     if (n_procs == 1) {
@@ -248,6 +248,7 @@ int main(int argc, char *argv[])
     }
 
     // End processing.
+    printf("Elapsed time: %lf seconds.\n", PI_EndTime());
     PI_StopMain(0);
 
     // Free all dynamically allocated memory.
