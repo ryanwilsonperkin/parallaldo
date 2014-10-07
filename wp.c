@@ -16,7 +16,9 @@
 PI_CHANNEL **g_results;         // global list of result channels (worker -> PI_MAIN)
 PI_CHANNEL **g_instructions;    // global list of instruction channels (PI_MAIN -> worker)
 PI_BUNDLE *g_results_bundle;    // global bundle of instruction channels (PI_MAIN -> worker)
+char *g_parallaldo_dir;         // global name of directory with parallaldo files
 char **g_parallaldo_files;      // global list of parallaldo file names
+char *g_image_dir;              // gloabl name of directory with image files
 char **g_image_files;           // global list of image file names
 
 /*
@@ -35,8 +37,8 @@ int worker(int id, void *p)
         PI_Read(g_instructions[id], "%d%d%d", (int *)&instruction, &parallaldo_id, &image_id);
         switch (instruction) {
             case WORKER_TASK: {
-                Parallaldo parallaldo = load_parallaldo(g_parallaldo_files[parallaldo_id]);
-                Image image = load_image(g_image_files[image_id]);
+                Parallaldo parallaldo = load_parallaldo(g_parallaldo_dir, g_parallaldo_files[parallaldo_id]);
+                Image image = load_image(g_image_dir, g_image_files[image_id]);
                 Position position = find_parallaldo(parallaldo, image);
 
                 PI_Write(g_results[id], "%d%d%d%d%d", parallaldo_id, image_id, position.y, position.x, position.r);
@@ -63,8 +65,8 @@ void serial(int n_parallaldos, int n_images)
 {
     for (int i = 0; i < n_parallaldos; i++) {
         for (int j = 0; j < n_images; j++) {
-            Parallaldo parallaldo = load_parallaldo(g_parallaldo_files[i]);
-            Image image = load_image(g_image_files[j]);
+            Parallaldo parallaldo = load_parallaldo(g_parallaldo_dir, g_parallaldo_files[i]);
+            Image image = load_image(g_image_dir, g_image_files[j]);
             Position position = find_parallaldo(parallaldo, image);
 
             if (position.y && position.x) {
@@ -175,7 +177,6 @@ int main(int argc, char *argv[])
 {
     PI_PROCESS **processes = NULL;
     int n_procs, n_parallaldos, n_images;
-    char *parallaldo_dir, *image_dir;
     bool load_balancer;
 
     // Initialize Pilot environment.
@@ -184,20 +185,20 @@ int main(int argc, char *argv[])
     // Parse command line arguments.
     if (argc == 4 && strcmp(argv[1], "-b") == 0) {
         load_balancer = true;
-        parallaldo_dir = argv[2];
-        image_dir = argv[3];
+        g_parallaldo_dir = argv[2];
+        g_image_dir = argv[3];
     } else if (argc == 3) {
         load_balancer = false;
-        parallaldo_dir = argv[1];
-        image_dir = argv[2];
+        g_parallaldo_dir = argv[1];
+        g_image_dir = argv[2];
     } else {
         fprintf(stderr, "usage: wp [-b] parallaldodir imagedir\n");
         return 1;
     }
 
     // Get filenames from directories.
-    n_parallaldos = list_filenames(parallaldo_dir, &g_parallaldo_files);
-    n_images = list_filenames(image_dir, &g_image_files);
+    n_parallaldos = list_filenames(g_parallaldo_dir, &g_parallaldo_files);
+    n_images = list_filenames(g_image_dir, &g_image_files);
 
     // Initialize processes and channels.
     if (n_procs > 1) {

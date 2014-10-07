@@ -13,7 +13,6 @@
  *  Calculate and allocate needed space for a new string combining dir and filename.
  *  Concatenate dir, '/', and filename, and return the resulting string.
  */
-// TODO: Remote get_relative_filename, filenames should not have directory.
 char *get_relative_filename(const char *dir, const char *filename)
 {
     int dir_length = strlen(dir);
@@ -31,9 +30,9 @@ char *get_relative_filename(const char *dir, const char *filename)
 }
 
 /*
- * list_filename
+ * list_filenames
  *  Count number of files in dir, allocate same number of strings in filenames list.
- *  Read name of each file in dir and add relative filename string to list.
+ *  Read name of each file in dir and add filename string to list.
  *  note: adapted from GNU libc manual: https://www.gnu.org/software/libc/manual/html_node/Simple-Directory-Lister.html
  */
 int list_filenames(const char *dir, char ***filenames)
@@ -65,7 +64,12 @@ int list_filenames(const char *dir, char ***filenames)
     i = 0;
     while (ep = readdir(dp)) {
         if (ep->d_type == DT_REG) {
-            (*filenames)[i] = get_relative_filename(dir, ep->d_name);
+            (*filenames)[i] = malloc((strlen(ep->d_name) + 1) * sizeof(char));
+            if ((*filenames)[i] == NULL) {
+                fprintf(stderr, "error: list_filenames: can't initialize (*filenames)[%d], out of memory.\n", i);
+                exit(EXIT_FAILURE);
+            }
+            (*filenames)[i] = strcpy((*filenames)[i], ep->d_name);
             i++;
         }
     }

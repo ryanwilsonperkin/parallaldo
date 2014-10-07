@@ -50,11 +50,12 @@ typedef Parallaldo Image;
  * load_parallaldo
  *  Read data from file into a new Parallaldo.
  *
+ *  dir: the directory to find the file in
  *  filename: the file name to read data from
  *
  *  returns: a new Parallaldo
  */
-Parallaldo load_parallaldo(const char *filename);
+Parallaldo load_parallaldo(const char *dir, const char *filename);
 
 /*
  * free_parallaldo
@@ -68,11 +69,12 @@ void free_parallaldo(Parallaldo p);
  * load_image
  *  Read data from file into a new Image.
  *
+ *  dir: the directory to find the file in
  *  filename: the file name to read data from
  *
  *  returns: a new Image
  */
-Image load_image(const char *filename);
+Image load_image(const char *dir, const char *filename);
 
 /*
  * free_image

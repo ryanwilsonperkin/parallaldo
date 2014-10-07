@@ -1,21 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "filenames.h"
 #include "parallaldo.h"
 
 /*
  * load_parallaldo
- *  Try to open filename file and read data into Parallaldo.
+ *  Try to open dir/filename file and read data into Parallaldo.
  *  First two integers (separated by a single space) are the height and width.
  *  Reads "height" number of additional lines.
  *  Additional lines are width + 1 long (newline terminated) and read into pixels as strings.
  */
-// TODO: Pass in directory in order to lookup filename.
-Parallaldo load_parallaldo(const char *filename)
+Parallaldo load_parallaldo(const char *dir, const char *filename)
 {
     int i;
     Parallaldo p;
-    FILE *f = fopen(filename, "r");
+    char *relative_filename = get_relative_filename(dir, filename);
+    FILE *f = fopen(relative_filename, "r");
 
     if (f) {
         fscanf(f, "%d %d", &(p.height), &(p.width));
@@ -38,6 +39,7 @@ Parallaldo load_parallaldo(const char *filename)
         fprintf(stderr, "error: load_parallaldo: could not open file %s for read.\n", filename);
         exit(EXIT_FAILURE);
     }
+    free(relative_filename);
     return p;
 }
 
@@ -58,9 +60,9 @@ void free_parallaldo(Parallaldo p)
  * load_image
  *  Images are isomorphic to Parallaldos, so defer to load_parallaldo and cast result to Image.
  */
-Image load_image(const char *filename)
+Image load_image(const char *dir, const char *filename)
 {
-    return (Image)load_parallaldo(filename);
+    return (Image)load_parallaldo(dir, filename);
 }
 
 /*
