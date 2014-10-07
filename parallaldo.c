@@ -73,51 +73,68 @@ void free_image(Image i)
 }
 
 /*
+ * test_location
+ */
+// TODO: Add to parallaldo.h and document.
+bool test_location(Parallaldo p, Image i, int iy, int ix, int rotation)
+{
+    int py_start, py_end, py_step, px_start, px_end, px_step;
+    switch (rotation) {
+        case 0:
+            py_start = 0, py_end = p.height - 1, py_step = 1;
+            px_start = 0, px_end = p.width - 1, px_step = 1;
+            break;
+        case 90:
+            py_start = 0, py_end = p.width - 1, py_step = 1;
+            px_start = p.height - 1, px_end = 0, px_step = -1;
+            break;
+        case 180:
+            py_start = p.height - 1, py_end = 0, py_step = -1;
+            px_start = p.width - 1, px_end = 0, px_step = -1;
+            break;
+        case 270:
+            py_start = p.width - 1, py_end = 0, py_step = -1;
+            px_start = 0, px_end = p.height - 1, px_step = 1;
+            break;
+        default:
+            fprintf(stderr, "error: test_location: invalid rotation %d\n", rotation);
+            exit(EXIT_FAILURE);
+    }
+
+    for (int y_offset = 0, py = py_start; py != py_end; py += py_step, y_offset++) {
+        for (int x_offset = 0, px = px_start; px != px_end; px += px_step, x_offset++) {
+            switch (rotation) {
+                case 0:
+                case 180:
+                    if (p.pixels[py][px] != i.pixels[iy + y_offset][ix + x_offset]) return false;
+                    break;
+                case 90:
+                case 270:
+                    if (p.pixels[px][py] != i.pixels[iy + y_offset][ix + x_offset]) return false;
+                    break;
+            }
+        }
+    }
+    return true;
+}
+
+/*
  * find_parallaldo
  *  Algorithm not yet defined.
  */
 // TODO: Improve algorithm.
-Position find_parallaldo(Parallaldo parallaldo, Image image)
+Position find_parallaldo(Parallaldo p, Image i)
 {
-    int found;
-    for (int iy = 0; iy < image.height - parallaldo.height; iy++) {
-        for (int ix = 0; ix < image.width - parallaldo.width; ix++) {
-            found = 1;
-            for (int py = 0; py < parallaldo.height; py++) {
-                for (int px = 0; px < parallaldo.width; px++) {
-                    int y_offset = py, x_offset = px;
-                    if (parallaldo.pixels[py][px] != image.pixels[iy + y_offset][ix + x_offset]) found = 0;
-                }
-            }
-            if (found) return (Position){iy + 1, ix + 1, 0};
-            found = 1;
-            for (int py = parallaldo.height - 1; py >= 0; py--) {
-                for (int px = parallaldo.width - 1; px >= 0; px--) {
-                    int y_offset = parallaldo.height - 1 - py, x_offset = parallaldo.width - 1 - px;
-                    if (parallaldo.pixels[py][px] != image.pixels[iy + y_offset][ix + x_offset]) found = 0;
-                }
-            }
-            if (found) return (Position){iy + parallaldo.height, ix + parallaldo.width, 180};
+    for (int iy = 0; iy < i.height - p.height; iy++) {
+        for (int ix = 0; ix < i.width - p.width; ix++) {
+            if (test_location(p, i, iy, ix, 0)) return (Position) {iy + 1, ix + 1, 0};
+            if (test_location(p, i, iy, ix, 180)) return (Position) {iy + p.height, ix + p.width, 180};
         }
     }
-    for (int iy = 0; iy < image.height - parallaldo.width; iy++) {
-        for (int ix = 0; ix < image.width - parallaldo.height; ix++) {
-            found = 1;
-            for (int py = 0; py < parallaldo.width; py++) {
-                for (int px = parallaldo.height - 1; px >= 0; px--) {
-                    int y_offset = py, x_offset = parallaldo.height - 1 - px;
-                    if (parallaldo.pixels[px][py] != image.pixels[iy + y_offset][ix + x_offset]) found = 0;
-                }
-            }
-            if (found) return (Position){iy + 1, ix + parallaldo.height, 90};
-            found = 1;
-            for (int py = parallaldo.width - 1; py >= 0; py--) {
-                for (int px = 0; px < parallaldo.height; px++) {
-                    int y_offset = parallaldo.width - 1 - py, x_offset =  px;
-                    if (parallaldo.pixels[px][py] != image.pixels[iy + y_offset][ix + x_offset]) found = 0;
-                }
-            }
-            if (found) return (Position){iy + parallaldo.width, ix + 1, 270};
+    for (int iy = 0; iy < i.height - p.width; iy++) {
+        for (int ix = 0; ix < i.width - p.height; ix++) {
+            if (test_location(p, i, iy, ix, 90)) return (Position) {iy + 1, ix + p.height, 90};
+            if (test_location(p, i, iy, ix, 270)) return (Position) {iy + p.width, ix + 1, 270};
         }
     }
     return (Position){0,0,0};
