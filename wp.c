@@ -1,3 +1,5 @@
+// TODO: Include timing functions for measuring runtime.
+// TODO: (Possbily) get rid of extraneous globals.
 // TODO: Add license comment at top of each header file.
 #include <pilot.h>
 #include <stdio.h>
