@@ -1,6 +1,11 @@
 #ifndef PARALLALDO_PARALLALDO_H
 #define PARALLALDO_PARALLALDO_H
 
+#define true 1
+#define false 0
+
+typedef int bool;
+
 /*
  * Position
  *  A point and orientation of a Parallaldo in an Image.
