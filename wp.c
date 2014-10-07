@@ -176,18 +176,18 @@ int main(int argc, char *argv[])
     PI_PROCESS **processes = NULL;
     int n_procs, n_parallaldos, n_images;
     char *parallaldo_dir, *image_dir;
-    boolean load_balancer;
+    bool load_balancer;
 
     // Initialize Pilot environment.
     n_procs = PI_Configure(&argc, &argv);
 
     // Parse command line arguments.
     if (argc == 4 && strcmp(argv[1], "-b") == 0) {
-        load_balancer = TRUE;
+        load_balancer = true;
         parallaldo_dir = argv[2];
         image_dir = argv[3];
     } else if (argc == 3) {
-        load_balancer = FALSE;
+        load_balancer = false;
         parallaldo_dir = argv[1];
         image_dir = argv[2];
     } else {
