@@ -133,7 +133,6 @@ bool test_location(Parallaldo p, Image i, int iy, int ix, int rotation)
  * find_parallaldo
  *  Algorithm not yet defined.
  */
-// TODO: Improve algorithm.
 Position find_parallaldo(Parallaldo p, Image i)
 {
     for (int iy = 0; iy < i.height - p.height; iy++) {

@@ -8,7 +8,6 @@
  *  author: Ryan Wilson-Perkin
  *  student number: 0719644
  */ 
-// TODO: (Possbily) get rid of extraneous globals.
 #include <pilot.h>
 #include <stdio.h>
 #include <stdlib.h>
